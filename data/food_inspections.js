@@ -1,15 +1,28 @@
+var FoodInspectionsExtension = {};
+FoodInspectionsExtension.columns = {};
+
+
+function formatDateString(dateString){
+    var date = new Date(dateString);
+    var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November",     "December" ];
+    return months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
+}
+
 self.port.on("log", function(msg){
     console.log(msg);
 });
 
-self.port.on("alert", function(msg) {
+self.port.on("columnsReceived", function(columns) {
+    FoodInspectionsExtension.columns = columns;
+    
     var rating_element = document.getElementById("bizRating");
     if(rating_element){                
-        rating_element.insertAdjacentHTML('beforeEnd', "<div>" + msg + "</div>");
+        rating_element.insertAdjacentHTML('beforeEnd', '<div id="food_inspections_ext"><table id="food_inspections_ext--results"><tr class="food_inspections_ext--header">'
+                                            + '<th>Inspection Date</th><th>Name</th><th>Risk</th><th>Violations</th><th>Address</th></tr></table>'
+                                            + msg + '</div>');
     
         self.port.emit("show");
-    }
-    
+    }    
 });
 
 self.port.on("getAddress", function(){
@@ -32,4 +45,15 @@ self.port.on("getAddress", function(){
     }
     console.log('end getAddress: ' + address_string);
     self.port.emit("gotAddress", address_string);
+});
+
+worker.port.on("inspectionDataReceived", function(data){
+    var results = $("#food_inspections_ext--results"),
+        columns = FoodInspectionsExtension.columns;
+
+    for(var i = 0;i < data.length;i++){
+        results.append("<tr> <td>" + formatDateString(data[i][columns['inspection_date']]) + "</td> <td>" + data[i][columns['aka_name']] + "</td> <td>" 
+                        + data[i][columns['risk']] + "</td>  <td>" + data[i][columns['violations']] + "</td> <td>" + data[i][columns['address']] 
+                        + "</td> </tr>");
+    }
 });
