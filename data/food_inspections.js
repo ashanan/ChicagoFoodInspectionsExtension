@@ -1,16 +1,18 @@
+self.port.on("log", function(msg){
+    console.log(msg);
+});
+
 self.port.on("alert", function(msg) {
     var rating_element = document.getElementById("bizRating");
     if(rating_element){                
-        // add the newly created element and its content into the DOM
-        console.log(rating_element);
         rating_element.insertAdjacentHTML('beforeEnd', "<div>" + msg + "</div>");
     
-        self.port.emit("show", "from f_i.js");
+        self.port.emit("show");
     }
     
 });
 
-self.port.on("getAddress", function(data){
+self.port.on("getAddress", function(){
     var address_element = document.getElementsByTagName("address")[0],
         address_nodes = address_element.children,
         item_properties,
@@ -29,4 +31,5 @@ self.port.on("getAddress", function(data){
         }
     }
     console.log('end getAddress: ' + address_string);
+    self.port.emit("gotAddress", address_string);
 });
