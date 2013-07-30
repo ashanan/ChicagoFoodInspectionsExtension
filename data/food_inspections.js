@@ -4,6 +4,7 @@ FoodInspectionsExtension.ratingsCount = 0;
 
 
 function formatDateString(dateString){
+    console.log('formatDateString: ' + dateString)
     var date = new Date(dateString);
     var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November",     "December" ];
     return months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
@@ -15,12 +16,11 @@ self.port.on("log", function(msg){
 
 self.port.on("columnsReceived", function(columns) {
     FoodInspectionsExtension.columns = columns;
-    console.log("cols: " + columns)
+    console.log("cols: " + JSON.stringify(columns));
     
     var rating_element = $('#bizRating');
     console.log('bizrating: ' + $('#bizRating'));
-    if(rating_element && FoodInspectionsExtension.ratingsCount == 0){        
-        //alert(rating_element);        
+    if(rating_element && FoodInspectionsExtension.ratingsCount == 0){   
         FoodInspectionsExtension.ratingsCount++;
         rating_element.after('<div id="food_inspections_ext"><table id="food_inspections_ext--results"><tr class="food_inspections_ext--header">'
                             + '<th>Inspection Date</th><th>Name</th><th>Risk</th><th>Violations</th><th>Address</th></tr></table></div>');
@@ -35,7 +35,7 @@ self.port.on("getAddress", function(){
         item_properties,
         address_string;
         
-    alert("getting address");
+    console.log("getting address");
       
     for(i = 0;i < address_nodes.length;i++){
         if(address_nodes[i].itemProp){
@@ -56,6 +56,8 @@ self.port.on("getAddress", function(){
 self.port.on("inspectionDataReceived", function(data){
     var results = $("#food_inspections_ext--results"),
         columns = FoodInspectionsExtension.columns;
+        
+    console.log('inspectionDataReceived :' + JSON.stringify(data));
 
     for(var i = 0;i < data.length;i++){
         results.append("<tr> <td>" + formatDateString(data[i][columns['inspection_date']]) + "</td> <td>" + data[i][columns['aka_name']] + "</td> <td>" 
