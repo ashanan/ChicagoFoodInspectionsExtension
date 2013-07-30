@@ -1,5 +1,6 @@
 var FoodInspectionsExtension = {};
 FoodInspectionsExtension.columns = {};
+FoodInspectionsExtension.ratingsCount = 0;
 
 
 function formatDateString(dateString){
@@ -14,12 +15,15 @@ self.port.on("log", function(msg){
 
 self.port.on("columnsReceived", function(columns) {
     FoodInspectionsExtension.columns = columns;
+    console.log("cols: " + columns)
     
-    var rating_element = document.getElementById("bizRating");
-    if(rating_element){                
-        rating_element.insertAdjacentHTML('beforeEnd', '<div id="food_inspections_ext"><table id="food_inspections_ext--results"><tr class="food_inspections_ext--header">'
-                                            + '<th>Inspection Date</th><th>Name</th><th>Risk</th><th>Violations</th><th>Address</th></tr></table>'
-                                            + msg + '</div>');
+    var rating_element = $('#bizRating');
+    console.log('bizrating: ' + $('#bizRating'));
+    if(rating_element && FoodInspectionsExtension.ratingsCount == 0){        
+        //alert(rating_element);        
+        FoodInspectionsExtension.ratingsCount++;
+        rating_element.after('<div id="food_inspections_ext"><table id="food_inspections_ext--results"><tr class="food_inspections_ext--header">'
+                            + '<th>Inspection Date</th><th>Name</th><th>Risk</th><th>Violations</th><th>Address</th></tr></table></div>');
     
         self.port.emit("show");
     }    
@@ -30,6 +34,8 @@ self.port.on("getAddress", function(){
         address_nodes = address_element.children,
         item_properties,
         address_string;
+        
+    alert("getting address");
       
     for(i = 0;i < address_nodes.length;i++){
         if(address_nodes[i].itemProp){
@@ -47,7 +53,7 @@ self.port.on("getAddress", function(){
     self.port.emit("gotAddress", address_string);
 });
 
-worker.port.on("inspectionDataReceived", function(data){
+self.port.on("inspectionDataReceived", function(data){
     var results = $("#food_inspections_ext--results"),
         columns = FoodInspectionsExtension.columns;
 
