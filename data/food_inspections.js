@@ -31,10 +31,17 @@ self.port.on("columnsReceived", function(columns) {
 
 self.port.on("getAddress", function(){
     var address_element = document.getElementsByTagName("address")[0],
-        address_nodes = address_element.children,
+        address_nodes,
         item_properties,
-        address_string;
+        address_string,
+        tries = 0;
         
+    while(address_element == undefined && tries < 30){
+        address_element = document.getElementsByTagName("address")[0];
+        tries++;
+    }
+    
+    address_nodes = address_element.children
     console.log("getting address");
       
     for(i = 0;i < address_nodes.length;i++){
