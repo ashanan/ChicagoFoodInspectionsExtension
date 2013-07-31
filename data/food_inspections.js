@@ -22,8 +22,14 @@ self.port.on("columnsReceived", function(columns) {
     console.log('bizrating: ' + $('#bizRating'));
     if(rating_element && FoodInspectionsExtension.ratingsCount == 0){   
         FoodInspectionsExtension.ratingsCount++;
-        rating_element.after('<div id="food_inspections_ext"><table id="food_inspections_ext--results"><tr class="food_inspections_ext--header">'
+        rating_element.after('<div id="food_inspections_ext"><a class="food_inspections_ext--toggle_results" href="#">Show inspection results</a>'
+                            + '<table id="food_inspections_ext--results"><tr class="food_inspections_ext--header">'
                             + '<th>Inspection Date</th><th>Name</th><th>Risk</th><th>Violations</th><th>Address</th></tr></table></div>');
+                            
+        $('.food_inspections_ext--toggle_results').click(function(){
+            $("#food_inspections_ext--results").toggle();
+            return false;
+        });
     
         self.port.emit("show");
     }    
