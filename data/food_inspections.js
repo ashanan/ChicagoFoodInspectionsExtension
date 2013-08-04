@@ -1,6 +1,21 @@
+function Inspection(rawData, columns){
+    this.inspectionDate = rawData[columns['inspection_date']];
+    this.name = rawData[columns['aka_name']];
+    this.risk = rawData[columns['risk']];
+    this.violations = rawData[columns['violations']];
+    this.address = rawData[columns['address']];
+}
+    
+Inspection.prototype.formattedDate = function(){
+    var date = new Date(this.inspectionDate),
+        months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
+    return months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
+}
+
 var FoodInspectionsExtension = {};
 FoodInspectionsExtension.columns = {};
 FoodInspectionsExtension.ratingsCount = 0;
+FoodInspectionsExtension.inspections = [];
 
 
 function formatDateString(dateString){
@@ -67,14 +82,17 @@ self.port.on("getAddress", function(){
 });
 
 self.port.on("inspectionDataReceived", function(data){
-    var results = $("#food_inspections_ext--results"),
+    var results = $("#food_inspections_ext--results"), inspection,
         columns = FoodInspectionsExtension.columns;
         
     console.log('inspectionDataReceived :' + JSON.stringify(data));
 
     for(var i = 0;i < data.length;i++){
-        results.append("<tr> <td>" + formatDateString(data[i][columns['inspection_date']]) + "</td> <td>" + data[i][columns['aka_name']] + "</td> <td>" 
-                        + data[i][columns['risk']] + "</td>  <td>" + data[i][columns['violations']] + "</td> <td>" + data[i][columns['address']] 
+        inspection = new Inspection(data[i], columns);
+        console.log(inspection);
+        console.log(inspection.formattedDate());
+        results.append("<tr> <td>" + inspection.formattedDate() + "</td> <td>" + inspection.name + "</td> <td>" 
+                        + inspection.risk + "</td>  <td>" + inspection.violations + "</td> <td>" + inspection.address
                         + "</td> </tr>");
     }
 });
