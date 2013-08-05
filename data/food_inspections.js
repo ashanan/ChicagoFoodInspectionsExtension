@@ -12,18 +12,16 @@ Inspection.prototype.formattedDate = function(){
     return months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
 }
 
-var FoodInspectionsExtension = {};
-FoodInspectionsExtension.columns = {};
-FoodInspectionsExtension.ratingsCount = 0;
-FoodInspectionsExtension.inspections = [];
-
-
-function formatDateString(dateString){
-    console.log('formatDateString: ' + dateString)
-    var date = new Date(dateString);
-    var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November",     "December" ];
-    return months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
-}
+var FoodInspectionsExtension = {
+    columns : {},
+    ratingsCount : 0,
+    inspections : [],
+    initialize : function(data){
+        for(var i = 0;i < data.length;i++){
+            this.inspections.push(new Inspection(data[i], this.columns));
+        }
+    }
+};
 
 self.port.on("log", function(msg){
     console.log(msg);
@@ -82,15 +80,15 @@ self.port.on("getAddress", function(){
 });
 
 self.port.on("inspectionDataReceived", function(data){
-    var results = $("#food_inspections_ext--results"), inspection,
-        columns = FoodInspectionsExtension.columns;
+    var results = $("#food_inspections_ext--results"),
+        inspection;
         
     console.log('inspectionDataReceived :' + JSON.stringify(data));
+    
+    FoodInspectionsExtension.initialize(data);
 
-    for(var i = 0;i < data.length;i++){
-        inspection = new Inspection(data[i], columns);
-        console.log(inspection);
-        console.log(inspection.formattedDate());
+    for(var i = 0;i < FoodInspectionsExtension.inspections.length;i++){
+        inspection = FoodInspectionsExtension.inspections[i];
         results.append("<tr> <td>" + inspection.formattedDate() + "</td> <td>" + inspection.name + "</td> <td>" 
                         + inspection.risk + "</td>  <td>" + inspection.violations + "</td> <td>" + inspection.address
                         + "</td> </tr>");
