@@ -1,7 +1,7 @@
 function Inspection(rawData, columns){
     this.inspectionDate = rawData[columns['inspection_date']];
     this.name = rawData[columns['aka_name']];
-    this.risk = rawData[columns['risk']];
+    this.risk = rawData[columns['risk']].substr(5);
     this.violations = rawData[columns['violations']];
     this.address = rawData[columns['address']];
 }
@@ -81,11 +81,18 @@ self.port.on("getAddress", function(){
 
 self.port.on("inspectionDataReceived", function(data){
     var results = $("#food_inspections_ext--results"),
-        inspection;
+        inspection,
+        latestInspection,
+        latestInspectionList;
         
     console.log('inspectionDataReceived :' + JSON.stringify(data));
     
     FoodInspectionsExtension.initialize(data);
+    
+    latestInspection = FoodInspectionsExtension.inspections[0];
+    latestInspectionList = '<ul><li>Most recent inspection: ' + latestInspection.formattedDate() + '</li>'
+                           + '<li>Risk: ' + latestInspection.risk + '</li></ul>';
+    $('#food_inspections_ext').prepend(latestInspectionList);
 
     for(var i = 0;i < FoodInspectionsExtension.inspections.length;i++){
         inspection = FoodInspectionsExtension.inspections[i];
