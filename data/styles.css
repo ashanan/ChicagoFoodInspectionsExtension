@@ -1,7 +1,7 @@
-#food_inspections_ext--results{
+#food_inspections_ext--results, #food_inspections_ext--no_results_message{
     display:none;   
 }
 
 .food_inspections_ext--toggle_results{
-    
+    display:none;   
 }

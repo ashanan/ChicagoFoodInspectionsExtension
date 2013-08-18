@@ -35,7 +35,8 @@ self.port.on("columnsReceived", function(columns) {
     console.log('bizrating: ' + $('#bizRating'));
     if(rating_element && FoodInspectionsExtension.ratingsCount == 0){   
         FoodInspectionsExtension.ratingsCount++;
-        rating_element.after('<div id="food_inspections_ext"><a class="food_inspections_ext--toggle_results" href="#">Show inspection results</a>'
+        rating_element.after('<div id="food_inspections_ext"><span id="food_inspections_ext--no_results_message">No food inspection results were found.</span>'
+                            + '<a class="food_inspections_ext--toggle_results" href="#">Show inspection results</a>'
                             + '<table id="food_inspections_ext--results"><tr class="food_inspections_ext--header">'
                             + '<th>Inspection Date</th><th>Name</th><th>Risk</th><th>Violations</th><th>Address</th></tr></table></div>');
                             
@@ -89,15 +90,21 @@ self.port.on("inspectionDataReceived", function(data){
     
     FoodInspectionsExtension.initialize(data);
     
-    latestInspection = FoodInspectionsExtension.inspections[0];
-    latestInspectionList = '<ul><li>Most recent inspection: ' + latestInspection.formattedDate() + '</li>'
-                           + '<li>Risk: ' + latestInspection.risk + '</li></ul>';
-    $('#food_inspections_ext').prepend(latestInspectionList);
-
-    for(var i = 0;i < FoodInspectionsExtension.inspections.length;i++){
-        inspection = FoodInspectionsExtension.inspections[i];
-        results.append("<tr> <td>" + inspection.formattedDate() + "</td> <td>" + inspection.name + "</td> <td>" 
-                        + inspection.risk + "</td>  <td>" + inspection.violations + "</td> <td>" + inspection.address
-                        + "</td> </tr>");
+    if(FoodInspectionsExtension.inspections.length > 0){
+        $(".food_inspections_ext--toggle_results").show();
+        latestInspection = FoodInspectionsExtension.inspections[0];
+        latestInspectionList = '<ul><li>Most recent inspection: ' + latestInspection.formattedDate() + '</li>'
+                               + '<li>Risk: ' + latestInspection.risk + '</li></ul>';
+        $('#food_inspections_ext').prepend(latestInspectionList);
+    
+        for(var i = 0;i < FoodInspectionsExtension.inspections.length;i++){
+            inspection = FoodInspectionsExtension.inspections[i];
+            results.append("<tr> <td>" + inspection.formattedDate() + "</td> <td>" + inspection.name + "</td> <td>" 
+                            + inspection.risk + "</td>  <td>" + inspection.violations + "</td> <td>" + inspection.address
+                            + "</td> </tr>");
+        }
+    }
+    else{
+        $('#food_inspections_ext--no_results_message').show();
     }
 });
